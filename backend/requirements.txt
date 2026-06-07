@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+pandas
+faker
+openpyxl
+pyarrow
+google-generativeai
+celery
+razorpay
