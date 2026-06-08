@@ -9,7 +9,15 @@ SUPPORTED_TYPES = [
     "Name", "First Name", "Last Name", "Age", "Gender", "Email", "Phone Number", 
     "Address", "City", "State", "Country", "Postal Code", "Date", "Datetime", 
     "Currency", "Product Name", "Company Name", "Employee ID", "Customer ID", 
-    "UUID", "Boolean", "Integer", "Float", "Categories", "Custom Text"
+    "UUID", "Boolean", "Integer", "Float", "Categories", "Custom Text",
+    "Disease / Diagnosis", "Medical Symptoms", "Medical Cause", "Medical Treatment", "Medical Severity",
+    "Crop Type", "Soil Type", "Water Source", "Fertilizer Used", "Yield Level",
+    "Transaction Type", "Merchant Category", "Card Type", "Risk Score",
+    "Course / Major", "Graduation Status", "Career Path",
+    "Case Type", "Verdict / Outcome",
+    "Department Name", "Employee Role", "Performance Rating",
+    "Product Category", "Service Type", "Asset Type", "Operating System",
+    "Location Type", "Campaign Type", "Marketing Channel"
 ]
 
 SYSTEM_PROMPT = f"""
@@ -154,6 +162,67 @@ def generate_offline_fallback(prompt: str) -> Dict[str, Any]:
     if "segment" in prompt.lower() or "status" in prompt.lower() or "level" in prompt.lower():
         col_name = "segment" if "segment" in prompt.lower() else "status"
         columns.append({"name": col_name, "type": "Categories", "null_pct": 0, "config": {"categories": ["Low", "Medium", "High"]}})
+
+    # Domain specific keywords detection
+    # Healthcare
+    if any(k in prompt.lower() for k in ["disease", "diagnosis", "condition"]):
+        columns.append({"name": "diagnosis", "type": "Disease / Diagnosis", "null_pct": 0, "config": {}})
+    if any(k in prompt.lower() for k in ["symptom", "symptoms"]):
+        columns.append({"name": "symptoms", "type": "Medical Symptoms", "null_pct": 0, "config": {}})
+    if any(k in prompt.lower() for k in ["cause", "causes", "etiology"]):
+        columns.append({"name": "cause", "type": "Medical Cause", "null_pct": 0, "config": {}})
+    if any(k in prompt.lower() for k in ["treatment", "medication"]):
+        columns.append({"name": "treatment", "type": "Medical Treatment", "null_pct": 0, "config": {}})
+    if "severity" in prompt.lower():
+        columns.append({"name": "severity", "type": "Medical Severity", "null_pct": 0, "config": {}})
+        
+    # Agriculture
+    if "crop" in prompt.lower():
+        columns.append({"name": "crop_type", "type": "Crop Type", "null_pct": 0, "config": {}})
+    if "soil" in prompt.lower():
+        columns.append({"name": "soil_type", "type": "Soil Type", "null_pct": 0, "config": {}})
+    if "fertilizer" in prompt.lower():
+        columns.append({"name": "fertilizer_used", "type": "Fertilizer Used", "null_pct": 0, "config": {}})
+    if "yield" in prompt.lower():
+        columns.append({"name": "yield_level", "type": "Yield Level", "null_pct": 0, "config": {}})
+        
+    # Finance
+    if "transaction" in prompt.lower() or "tx" in prompt.lower():
+        columns.append({"name": "transaction_type", "type": "Transaction Type", "null_pct": 0, "config": {}})
+    if "card" in prompt.lower():
+        columns.append({"name": "card_type", "type": "Card Type", "null_pct": 0, "config": {}})
+    if "risk" in prompt.lower():
+        columns.append({"name": "risk_score", "type": "Risk Score", "null_pct": 0, "config": {}})
+        
+    # Education
+    if "course" in prompt.lower() or "major" in prompt.lower():
+        columns.append({"name": "course", "type": "Course / Major", "null_pct": 0, "config": {}})
+    if "career" in prompt.lower() or "outcome" in prompt.lower():
+        columns.append({"name": "career_path", "type": "Career Path", "null_pct": 0, "config": {}})
+        
+    # Legal
+    if "case" in prompt.lower():
+        columns.append({"name": "case_type", "type": "Case Type", "null_pct": 0, "config": {}})
+    if "verdict" in prompt.lower() or "outcome" in prompt.lower():
+        columns.append({"name": "verdict", "type": "Verdict / Outcome", "null_pct": 0, "config": {}})
+        
+    # HR
+    if "department" in prompt.lower():
+        columns.append({"name": "department", "type": "Department Name", "null_pct": 0, "config": {}})
+    if "role" in prompt.lower() or "designation" in prompt.lower():
+        columns.append({"name": "role", "type": "Employee Role", "null_pct": 0, "config": {}})
+        
+    # Technology
+    if "asset" in prompt.lower():
+        columns.append({"name": "asset_type", "type": "Asset Type", "null_pct": 0, "config": {}})
+    if "os" in prompt.lower() or "operating system" in prompt.lower():
+        columns.append({"name": "operating_system", "type": "Operating System", "null_pct": 0, "config": {}})
+        
+    # Environment
+    if "location" in prompt.lower() or "habitat" in prompt.lower():
+        columns.append({"name": "location_type", "type": "Location Type", "null_pct": 0, "config": {}})
+    if "temperature" in prompt.lower() or "weather" in prompt.lower():
+        columns.append({"name": "temp", "type": "Float", "null_pct": 0, "config": {"min": -10, "max": 45}})
 
     # If no fields detected, generate a simple default table
     if not columns:

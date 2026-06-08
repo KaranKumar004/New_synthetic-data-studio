@@ -25,6 +25,86 @@ SUPPORTED_LOCALES = {
     "cn": "zh_CN",
 }
 
+DOMAIN_PRESETS = {
+    "healthcare": [
+        {"disease": "Type 2 Diabetes", "symptoms": "Polyuria, Polydipsia, Fatigue", "cause": "Insulin resistance, Genetics, Obesity", "severity": "Moderate", "treatment": "Metformin, Dietary changes, Exercise"},
+        {"disease": "Essential Hypertension", "symptoms": "Headaches, Dizziness, Chest pain", "cause": "High sodium, Obesity, Stress, Genetics", "severity": "Mild", "treatment": "Lisinopril, Amlodipine, Low-sodium diet"},
+        {"disease": "Acute Influenza (Flu)", "symptoms": "Fever, Chills, Cough, Sore throat", "cause": "Influenza virus infection", "severity": "Moderate", "treatment": "Oseltamivir, Bed rest, Hydration"},
+        {"disease": "Bronchial Asthma", "symptoms": "Wheezing, Cough, Shortness of breath", "cause": "Allergen exposure, Air pollution", "severity": "Moderate", "treatment": "Albuterol inhaler, Fluticasone"},
+        {"disease": "COVID-19 Infection", "symptoms": "Fever, Dry cough, Loss of smell", "cause": "SARS-CoV-2 viral transmission", "severity": "Severe", "treatment": "Paxlovid, Rest, Symptomatic care"}
+    ],
+    "agriculture": [
+        {"crop": "Rice", "soil": "Clayey", "water": "Rainfed / Irrigation", "fertilizer": "Urea / Nitrogen-rich", "yield": "High", "period_days": 120},
+        {"crop": "Wheat", "soil": "Loamy", "water": "Canal / Tubewell", "fertilizer": "DAP / Phosphorus-rich", "yield": "Moderate", "period_days": 140},
+        {"crop": "Cotton", "soil": "Black Sandy Loam", "water": "Drip Irrigation", "fertilizer": "Potassium-based", "yield": "High", "period_days": 180},
+        {"crop": "Maize (Corn)", "soil": "Alluvial Loam", "water": "Sprinkler", "fertilizer": "NPK Balanced Mix", "yield": "High", "period_days": 110},
+        {"crop": "Soybeans", "soil": "Sandy Clay", "water": "Rainfed", "fertilizer": "Phosphorus & Organic", "yield": "Low", "period_days": 100}
+    ],
+    "finance": [
+        {"tx_type": "Online Purchase", "category": "Electronics", "amount": 45000.0, "card_type": "Credit Card", "risk": "Medium", "is_fraud": False},
+        {"tx_type": "Atm Withdrawal", "category": "Cash", "amount": 5000.0, "card_type": "Debit Card", "risk": "Low", "is_fraud": False},
+        {"tx_type": "International Transfer", "category": "Travel", "amount": 185000.0, "card_type": "Credit Card", "risk": "High", "is_fraud": True},
+        {"tx_type": "Subscription Bill", "category": "Utilities", "amount": 999.0, "card_type": "Debit Card", "risk": "Low", "is_fraud": False},
+        {"tx_type": "Grocery Store", "category": "Groceries", "amount": 2500.0, "card_type": "Debit Card", "risk": "Low", "is_fraud": False}
+    ],
+    "education": [
+        {"course": "Computer Science", "hours": 42, "gpa": 3.8, "status": "Graduated", "career": "Software Engineer"},
+        {"course": "Mechanical Engineering", "hours": 35, "gpa": 3.2, "status": "Graduated", "career": "Design Engineer"},
+        {"course": "Business Administration", "hours": 20, "gpa": 3.0, "status": "Active", "career": "Management Intern"},
+        {"course": "Chemical Engineering", "hours": 38, "gpa": 3.4, "status": "Graduated", "career": "Process Analyst"},
+        {"course": "English Literature", "hours": 15, "gpa": 3.5, "status": "Active", "career": "Content Writer"}
+    ],
+    "legal": [
+        {"case_type": "Breach of Contract", "verdict": "Settlement", "judge": "Justice Robert Vance", "damages": 1500000.0, "complexity": "High"},
+        {"case_type": "Patent Infringement", "verdict": "Plaintiff Verdict", "judge": "Justice Sarah Jenkins", "damages": 8500000.0, "complexity": "Severe"},
+        {"case_type": "Employment Dispute", "verdict": "Dismissed", "judge": "Justice Robert Vance", "damages": 0.0, "complexity": "Medium"},
+        {"case_type": "Property Title Suit", "verdict": "Defendant Verdict", "judge": "Justice Alan Thorne", "damages": 250000.0, "complexity": "Medium"},
+        {"case_type": "Trademark Infringement", "verdict": "Settlement", "judge": "Justice Sarah Jenkins", "damages": 500000.0, "complexity": "High"}
+    ],
+    "hr": [
+        {"department": "Engineering", "role": "Senior Developer", "experience": 8, "rating": "Outstanding", "salary": 185000.0},
+        {"department": "Sales", "role": "Account Executive", "experience": 3, "rating": "Meets Expectations", "salary": 65000.0},
+        {"department": "Marketing", "role": "SEO Lead", "experience": 5, "rating": "Exceeds Expectations", "salary": 85000.0},
+        {"department": "Finance", "role": "Financial Analyst", "experience": 4, "rating": "Meets Expectations", "salary": 90000.0},
+        {"department": "HR", "role": "HR Manager", "experience": 7, "rating": "Outstanding", "salary": 110000.0}
+    ],
+    "retail": [
+        {"category": "Electronics", "product": "Smart OLED TV", "price": 68000.0, "stock": "In Stock", "rating": 4.6},
+        {"category": "Clothing", "product": "Slim Fit Denim Jeans", "price": 2400.0, "stock": "In Stock", "rating": 4.2},
+        {"category": "Home & Kitchen", "product": "Air Fryer 5L", "price": 7500.0, "stock": "Low Stock", "rating": 4.5},
+        {"category": "Sports", "product": "Yoga Mat Extra Thick", "price": 1200.0, "stock": "Out of Stock", "rating": 4.0},
+        {"category": "Books", "product": "ML Algorithms Guide", "price": 1800.0, "stock": "In Stock", "rating": 4.8}
+    ],
+    "government": [
+        {"service_type": "Passport Renewal", "dept": "Ministry of External Affairs", "status": "Approved", "resolution_days": 12, "rating": 4.4},
+        {"service_type": "Business License", "dept": "Municipal Corporation", "status": "Pending", "resolution_days": 30, "rating": 3.2},
+        {"service_type": "Income Tax Refund", "dept": "Revenue Department", "status": "Approved", "resolution_days": 45, "rating": 4.0},
+        {"service_type": "Driving License", "dept": "Road Transport Office", "status": "Rejected", "resolution_days": 8, "rating": 2.5},
+        {"service_type": "Land Registration", "dept": "Land Records Division", "status": "Approved", "resolution_days": 25, "rating": 3.8}
+    ],
+    "technology": [
+        {"asset_type": "Database Server", "os": "RHEL 9.2 Enterprise", "status": "Online", "patch_level": "Fully Patched", "vulnerabilities": 0},
+        {"asset_type": "Developer Workstation", "os": "Windows 11 Pro", "status": "Online", "patch_level": "Pending Updates", "vulnerabilities": 3},
+        {"asset_type": "Corporate Laptop", "os": "macOS Sonoma 14.1", "status": "Offline", "patch_level": "Fully Patched", "vulnerabilities": 1},
+        {"asset_type": "Network Firewall", "os": "Proprietary Firmware v8", "status": "Online", "patch_level": "Fully Patched", "vulnerabilities": 0},
+        {"asset_type": "Legacy File Server", "os": "Windows Server 2012 R2", "status": "Online", "patch_level": "Out of Support", "vulnerabilities": 14}
+    ],
+    "environment": [
+        {"location_type": "Desert Region", "temp": 42.5, "humidity": 12.0, "aqi": 140, "carbon_idx": 8.5},
+        {"location_type": "National Forest", "temp": 18.2, "humidity": 85.0, "aqi": 22, "carbon_idx": 1.2},
+        {"location_type": "Industrial District", "temp": 32.1, "humidity": 45.0, "aqi": 185, "carbon_idx": 12.8},
+        {"location_type": "Coastal Metropolis", "temp": 28.6, "humidity": 78.0, "aqi": 95, "carbon_idx": 6.4},
+        {"location_type": "Alpine Foothills", "temp": 12.4, "humidity": 60.0, "aqi": 35, "carbon_idx": 2.0}
+    ],
+    "marketing": [
+        {"campaign_type": "Social Video Ads", "channel": "YouTube / Instagram", "budget": 150000.0, "roi": 225.0, "status": "Active"},
+        {"campaign_type": "Search Ads", "channel": "Google Search", "budget": 80000.0, "roi": 180.0, "status": "Active"},
+        {"campaign_type": "Newsletter Campaign", "channel": "Email Marketing", "budget": 12000.0, "roi": 450.0, "status": "Completed"},
+        {"campaign_type": "Influencer Sponsor", "channel": "TikTok Ads", "budget": 250000.0, "roi": 95.0, "status": "Completed"},
+        {"campaign_type": "Display Banners", "channel": "Google Display Network", "budget": 40000.0, "roi": 60.0, "status": "Paused"}
+    ]
+}
+
 class SyntheticDataEngine:
     def __init__(self, locale: str = "en_US"):
         # Resolve locale
@@ -145,6 +225,77 @@ class SyntheticDataEngine:
         elif field_type_clean == "customtext" or field_type_clean == "text":
             sentences = int(config.get("sentences", 2))
             return self.fake.paragraph(nb_sentences=sentences)
+        # Healthcare Custom Types
+        elif field_type_clean in ["disease_/_diagnosis", "disease/diagnosis", "disease", "diagnosis", "diseasediagnosis"]:
+            return random.choice(DOMAIN_PRESETS["healthcare"])["disease"]
+        elif field_type_clean in ["medical_symptoms", "medicalsymptoms", "symptom", "symptoms"]:
+            return random.choice(DOMAIN_PRESETS["healthcare"])["symptoms"]
+        elif field_type_clean in ["medical_cause", "medicalcause", "cause", "causes"]:
+            return random.choice(DOMAIN_PRESETS["healthcare"])["cause"]
+        elif field_type_clean in ["medical_treatment", "medicaltreatment", "treatment", "medication"]:
+            return random.choice(DOMAIN_PRESETS["healthcare"])["treatment"]
+        elif field_type_clean in ["medical_severity", "medicalseverity", "severity"]:
+            return random.choice(DOMAIN_PRESETS["healthcare"])["severity"]
+        # Agriculture Custom Types
+        elif field_type_clean in ["crop_type", "croptype", "crop"]:
+            return random.choice(DOMAIN_PRESETS["agriculture"])["crop"]
+        elif field_type_clean in ["soil_type", "soiltype", "soil"]:
+            return random.choice(DOMAIN_PRESETS["agriculture"])["soil"]
+        elif field_type_clean in ["water_source", "watersource", "water"]:
+            return random.choice(DOMAIN_PRESETS["agriculture"])["water"]
+        elif field_type_clean in ["fertilizer_used", "fertilizerused", "fertilizer"]:
+            return random.choice(DOMAIN_PRESETS["agriculture"])["fertilizer"]
+        elif field_type_clean in ["yield_level", "yieldlevel", "yield"]:
+            return random.choice(DOMAIN_PRESETS["agriculture"])["yield"]
+        # Finance Custom Types
+        elif field_type_clean in ["transaction_type", "transactiontype", "tx_type", "txtype"]:
+            return random.choice(DOMAIN_PRESETS["finance"])["tx_type"]
+        elif field_type_clean in ["merchant_category", "merchantcategory", "category"]:
+            return random.choice(DOMAIN_PRESETS["finance"])["category"]
+        elif field_type_clean in ["card_type", "cardtype"]:
+            return random.choice(DOMAIN_PRESETS["finance"])["card_type"]
+        elif field_type_clean in ["risk_score", "riskscore", "risk"]:
+            return random.choice(DOMAIN_PRESETS["finance"])["risk"]
+        # Education Custom Types
+        elif field_type_clean in ["course_major", "coursemajor", "course", "major"]:
+            return random.choice(DOMAIN_PRESETS["education"])["course"]
+        elif field_type_clean in ["graduation_status", "graduationstatus", "status"]:
+            return random.choice(DOMAIN_PRESETS["education"])["status"]
+        elif field_type_clean in ["career_path", "careerpath", "career"]:
+            return random.choice(DOMAIN_PRESETS["education"])["career"]
+        # Legal Custom Types
+        elif field_type_clean in ["case_type", "casetype"]:
+            return random.choice(DOMAIN_PRESETS["legal"])["case_type"]
+        elif field_type_clean in ["verdict_outcome", "verdictoutcome", "verdict"]:
+            return random.choice(DOMAIN_PRESETS["legal"])["verdict"]
+        # HR Custom Types
+        elif field_type_clean in ["department_name", "departmentname", "department"]:
+            return random.choice(DOMAIN_PRESETS["hr"])["department"]
+        elif field_type_clean in ["employee_role", "employeerole", "role"]:
+            return random.choice(DOMAIN_PRESETS["hr"])["role"]
+        elif field_type_clean in ["performance_rating", "performancerating", "rating"]:
+            return random.choice(DOMAIN_PRESETS["hr"])["rating"]
+        # Retail Custom Types
+        elif field_type_clean in ["product_category", "productcategory"]:
+            return random.choice(DOMAIN_PRESETS["retail"])["category"]
+        elif field_type_clean in ["product_name", "productname", "product"]:
+            return random.choice(DOMAIN_PRESETS["retail"])["product"]
+        # Government Custom Types
+        elif field_type_clean in ["service_type", "servicetype"]:
+            return random.choice(DOMAIN_PRESETS["government"])["service_type"]
+        # Technology Custom Types
+        elif field_type_clean in ["asset_type", "assettype"]:
+            return random.choice(DOMAIN_PRESETS["technology"])["asset_type"]
+        elif field_type_clean in ["operating_system", "operatingsystem", "os"]:
+            return random.choice(DOMAIN_PRESETS["technology"])["os"]
+        # Environment Custom Types
+        elif field_type_clean in ["location_type", "locationtype"]:
+            return random.choice(DOMAIN_PRESETS["environment"])["location_type"]
+        # Marketing Custom Types
+        elif field_type_clean in ["campaign_type", "campaigntype"]:
+            return random.choice(DOMAIN_PRESETS["marketing"])["campaign_type"]
+        elif field_type_clean in ["marketing_channel", "marketingchannel", "channel"]:
+            return random.choice(DOMAIN_PRESETS["marketing"])["channel"]
         
         # Fallback to standard word/sentence
         return self.fake.word()
@@ -160,6 +311,63 @@ class SyntheticDataEngine:
         rows = []
         for i in range(num_rows):
             row = {}
+            
+            # Auto-detect domain based on column names or types
+            detected_domain = None
+            for col in columns:
+                name_l = col["name"].lower()
+                type_l = col["type"].lower()
+                
+                # Check Healthcare
+                if type_l in ["disease / diagnosis", "medical symptoms", "medical cause", "medical treatment", "medical severity"] or name_l in ["disease", "diagnosis", "symptom", "symptoms", "medical_condition"]:
+                    detected_domain = "healthcare"
+                    break
+                # Check Agriculture
+                elif type_l in ["crop type", "soil type", "water source", "fertilizer used", "yield level"] or name_l in ["crop", "soil", "soil_type", "crop_type", "fertilizer"]:
+                    detected_domain = "agriculture"
+                    break
+                # Check Finance
+                elif type_l in ["transaction type", "merchant category", "card type", "risk score"] or name_l in ["tx_type", "transaction_type", "card_type", "risk_score", "is_fraud"]:
+                    detected_domain = "finance"
+                    break
+                # Check Education
+                elif type_l in ["course / major", "graduation status", "career path"] or name_l in ["course", "major", "gpa", "study_hours"]:
+                    detected_domain = "education"
+                    break
+                # Check Legal
+                elif type_l in ["case type", "verdict / outcome"] or name_l in ["case_type", "verdict", "damages"]:
+                    detected_domain = "legal"
+                    break
+                # Check HR
+                elif type_l in ["department name", "employee role", "performance rating"] or name_l in ["department", "performance_rating", "experience_years"]:
+                    detected_domain = "hr"
+                    break
+                # Check Retail
+                elif type_l in ["product category", "product name"] or name_l in ["product", "product_name", "product_category"]:
+                    detected_domain = "retail"
+                    break
+                # Check Government
+                elif type_l in ["service type"] or name_l in ["service_type", "citizen_id"]:
+                    detected_domain = "government"
+                    break
+                # Check Technology
+                elif type_l in ["asset type", "operating system"] or name_l in ["asset_type", "operating_system", "patch_level"]:
+                    detected_domain = "technology"
+                    break
+                # Check Environment
+                elif type_l in ["location type"] or name_l in ["location_type", "aqi", "temperature_celsius"]:
+                    detected_domain = "environment"
+                    break
+                # Check Marketing
+                elif type_l in ["campaign type", "marketing channel"] or name_l in ["campaign_type", "campaign_name", "roi"]:
+                    detected_domain = "marketing"
+                    break
+
+            # Pre-select case for this row if a domain was detected
+            row_preset = None
+            if detected_domain and detected_domain in DOMAIN_PRESETS:
+                row_preset = random.choice(DOMAIN_PRESETS[detected_domain])
+
             for col in columns:
                 col_name = col["name"]
                 col_type = col["type"]
@@ -173,7 +381,145 @@ class SyntheticDataEngine:
                 if random.random() * 100 < effective_null_pct:
                     row[col_name] = None
                 else:
-                    val = self.generate_value(col_type, i, parent_keys, col_config)
+                    name_l = col_name.lower()
+                    type_l = col_type.lower()
+                    
+                    val = None
+                    # If we have a preset and this column is a domain-specific column, map it!
+                    if row_preset:
+                        if detected_domain == "healthcare":
+                            if col_type == "Disease / Diagnosis" or name_l in ["disease", "diagnosis", "medical_condition"]:
+                                val = row_preset["disease"]
+                            elif col_type == "Medical Symptoms" or name_l in ["symptom", "symptoms"]:
+                                val = row_preset["symptoms"]
+                            elif col_type == "Medical Cause" or name_l in ["cause", "causes", "etiology"]:
+                                val = row_preset["cause"]
+                            elif col_type == "Medical Treatment" or name_l in ["treatment", "medication", "treatments"]:
+                                val = row_preset["treatment"]
+                            elif col_type == "Medical Severity" or name_l == "severity":
+                                val = row_preset["severity"]
+                        elif detected_domain == "agriculture":
+                            if col_type == "Crop Type" or name_l in ["crop", "crop_type"]:
+                                val = row_preset["crop"]
+                            elif col_type == "Soil Type" or name_l in ["soil", "soil_type"]:
+                                val = row_preset["soil"]
+                            elif col_type == "Water Source" or name_l in ["water", "water_source"]:
+                                val = row_preset["water"]
+                            elif col_type == "Fertilizer Used" or name_l in ["fertilizer", "fertilizer_used"]:
+                                val = row_preset["fertilizer"]
+                            elif col_type == "Yield Level" or name_l in ["yield", "yield_level"]:
+                                val = row_preset["yield"]
+                            elif name_l in ["period_days", "growth_period_days", "growth_period"]:
+                                val = row_preset["period_days"]
+                        elif detected_domain == "finance":
+                            if col_type == "Transaction Type" or name_l in ["tx_type", "transaction_type"]:
+                                val = row_preset["tx_type"]
+                            elif col_type == "Merchant Category" or name_l in ["category", "merchant_category"]:
+                                val = row_preset["category"]
+                            elif col_type == "Card Type" or name_l in ["card", "card_type"]:
+                                val = row_preset["card_type"]
+                            elif col_type == "Risk Score" or name_l in ["risk", "risk_score"]:
+                                val = row_preset["risk"]
+                            elif name_l in ["is_fraud", "fraud"]:
+                                val = row_preset["is_fraud"]
+                            elif name_l == "amount":
+                                val = round(row_preset["amount"] * random.uniform(0.9, 1.1), 2)
+                        elif detected_domain == "education":
+                            if col_type == "Course / Major" or name_l in ["course", "major"]:
+                                val = row_preset["course"]
+                            elif col_type == "Graduation Status" or name_l in ["status", "graduation_status"]:
+                                val = row_preset["status"]
+                            elif col_type == "Career Path" or name_l in ["career", "career_path"]:
+                                val = row_preset["career"]
+                            elif name_l in ["hours", "study_hours", "study_hours_weekly"]:
+                                val = row_preset["hours"]
+                            elif name_l == "gpa":
+                                val = row_preset["gpa"]
+                        elif detected_domain == "legal":
+                            if col_type == "Case Type" or name_l in ["case", "case_type"]:
+                                val = row_preset["case_type"]
+                            elif col_type == "Verdict / Outcome" or name_l in ["verdict", "outcome"]:
+                                val = row_preset["verdict"]
+                            elif name_l == "judge":
+                                val = row_preset["judge"]
+                            elif name_l == "damages":
+                                val = row_preset["damages"]
+                            elif name_l == "complexity":
+                                val = row_preset["complexity"]
+                        elif detected_domain == "hr":
+                            if col_type == "Department Name" or name_l in ["department", "department_name"]:
+                                val = row_preset["department"]
+                            elif col_type == "Employee Role" or name_l in ["role", "employee_role"]:
+                                val = row_preset["role"]
+                            elif col_type == "Performance Rating" or name_l in ["rating", "performance_rating"]:
+                                val = row_preset["rating"]
+                            elif name_l in ["experience", "experience_years"]:
+                                val = row_preset["experience"]
+                            elif name_l == "salary":
+                                val = round(row_preset["salary"] * random.uniform(0.95, 1.05), 2)
+                        elif detected_domain == "retail":
+                            if col_type == "Product Category" or name_l in ["category", "product_category"]:
+                                val = row_preset["category"]
+                            elif col_type == "Product Name" or name_l in ["product", "product_name"]:
+                                val = row_preset["product"]
+                            elif name_l == "price":
+                                val = round(row_preset["price"] * random.uniform(0.98, 1.02), 2)
+                            elif name_l == "stock":
+                                val = row_preset["stock"]
+                            elif name_l == "rating":
+                                val = row_preset["rating"]
+                        elif detected_domain == "government":
+                            if col_type == "Service Type" or name_l in ["service", "service_type"]:
+                                val = row_preset["service_type"]
+                            elif name_l == "dept":
+                                val = row_preset["dept"]
+                            elif name_l == "status":
+                                val = row_preset["status"]
+                            elif name_l == "resolution_days":
+                                val = row_preset["resolution_days"]
+                            elif name_l == "rating":
+                                val = row_preset["rating"]
+                        elif detected_domain == "technology":
+                            if col_type == "Asset Type" or name_l in ["asset", "asset_type"]:
+                                val = row_preset["asset_type"]
+                            elif col_type == "Operating System" or name_l in ["os", "operating_system"]:
+                                val = row_preset["os"]
+                            elif name_l == "status":
+                                val = row_preset["status"]
+                            elif name_l == "patch_level":
+                                val = row_preset["patch_level"]
+                            elif name_l == "vulnerabilities":
+                                val = row_preset["vulnerabilities"]
+                        elif detected_domain == "environment":
+                            if col_type == "Location Type" or name_l in ["location", "location_type"]:
+                                val = row_preset["location_type"]
+                            elif name_l == "temp":
+                                val = round(row_preset["temp"] + random.uniform(-1.5, 1.5), 1)
+                            elif name_l == "humidity":
+                                val = round(row_preset["humidity"] + random.uniform(-5.0, 5.0), 1)
+                                val = max(0, min(100, val))
+                            elif name_l == "aqi":
+                                val = int(row_preset["aqi"] + random.randint(-10, 10))
+                                val = max(0, val)
+                            elif name_l == "carbon_idx":
+                                val = round(row_preset["carbon_idx"] + random.uniform(-0.5, 0.5), 1)
+                                val = max(0, val)
+                        elif detected_domain == "marketing":
+                            if col_type == "Campaign Type" or name_l in ["campaign", "campaign_type"]:
+                                val = row_preset["campaign_type"]
+                            elif col_type == "Marketing Channel" or name_l in ["channel", "marketing_channel"]:
+                                val = row_preset["channel"]
+                            elif name_l == "budget":
+                                val = round(row_preset["budget"] * random.uniform(0.9, 1.1), 2)
+                            elif name_l == "roi":
+                                val = round(row_preset["roi"] + random.uniform(-10.0, 10.0), 1)
+                            elif name_l == "status":
+                                val = row_preset["status"]
+
+                    # If not resolved from preset, generate using standard engine
+                    if val is None:
+                        val = self.generate_value(col_type, i, parent_keys, col_config)
+
                     if noise_level == "noisy" and isinstance(val, str) and random.random() < 0.05:
                         if val:
                             if random.random() < 0.5:

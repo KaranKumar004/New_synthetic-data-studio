@@ -224,6 +224,33 @@ def startup_event():
     finally:
         db.close()
 
+    # Seed Pro plan user for Karankumarsk14@gmail.com
+    db = next(get_db())
+    try:
+        pro_email = "Karankumarsk14@gmail.com"
+        user = db.query(User).filter(User.email == pro_email).first()
+        if not user:
+            user = User(
+                id=str(uuid.uuid4()),
+                email=pro_email,
+                plan="pro",
+                max_rows_limit=settings.PRO_LIMIT,
+                max_api_limit=settings.PRO_API_LIMIT
+            )
+            db.add(user)
+            db.commit()
+            print(f"Startup Seed: Created Pro user {pro_email}")
+        elif user.plan != "pro":
+            user.plan = "pro"
+            user.max_rows_limit = settings.PRO_LIMIT
+            user.max_api_limit = settings.PRO_API_LIMIT
+            db.commit()
+            print(f"Startup Seed: Upgraded user {pro_email} to Pro")
+    except Exception as e:
+        print(f"Startup Seed Error: {str(e)}")
+    finally:
+        db.close()
+
 # --- Auth Routes ---
 
 @app.post("/api/auth/register", response_model=Token)

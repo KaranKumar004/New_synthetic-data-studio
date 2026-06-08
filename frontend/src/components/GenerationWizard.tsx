@@ -24,7 +24,15 @@ const SUPPORTED_TYPES = [
   "Name", "First Name", "Last Name", "Age", "Gender", "Email", "Phone Number", 
   "Address", "City", "State", "Country", "Postal Code", "Date", "Datetime", 
   "Currency", "Product Name", "Company Name", "Employee ID", "Customer ID", 
-  "UUID", "Boolean", "Integer", "Float", "Categories", "Custom Text"
+  "UUID", "Boolean", "Integer", "Float", "Categories", "Custom Text",
+  "Disease / Diagnosis", "Medical Symptoms", "Medical Cause", "Medical Treatment", "Medical Severity",
+  "Crop Type", "Soil Type", "Water Source", "Fertilizer Used", "Yield Level",
+  "Transaction Type", "Merchant Category", "Card Type", "Risk Score",
+  "Course / Major", "Graduation Status", "Career Path",
+  "Case Type", "Verdict / Outcome",
+  "Department Name", "Employee Role", "Performance Rating",
+  "Product Category", "Service Type", "Asset Type", "Operating System",
+  "Location Type", "Campaign Type", "Marketing Channel"
 ];
 
 export default function GenerationWizard({ 
@@ -60,20 +68,20 @@ export default function GenerationWizard({
 
   // Domain definitions
   const DOMAINS = [
-    { id: "Healthcare",   label: "Medical / Healthcare",    icon: Stethoscope,  color: "text-rose-400",    bg: "bg-rose-500/10",    border: "border-rose-500/30",    prompt: "I need patient records for a hospital management system with patient_id, name, age, gender, blood_type, diagnosis, doctor_name, admission_date, discharge_date, and treatment_cost." },
-    { id: "Agriculture",  label: "Agriculture / Farming",   icon: Wheat,        color: "text-lime-400",    bg: "bg-lime-500/10",    border: "border-lime-500/30",    prompt: "I need farm records for an agricultural analytics platform with farmer_id, name, crop_type, farm_area_acres, region, soil_type, rainfall_mm, yield_tonnes, harvest_date, and revenue." },
-    { id: "Finance",      label: "Finance / Banking",       icon: Landmark,     color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", prompt: "I need financial transaction records with account_id, owner_name, account_type, balance, transaction_type, amount, transaction_date, currency, and status." },
-    { id: "Education",    label: "Education / Academia",    icon: GraduationCap,color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/30",    prompt: "I need student records for an education management system with student_id, name, age, gender, course, university, enrollment_year, gpa, attendance_pct, and graduation_status." },
-    { id: "Legal",        label: "Legal / Law",             icon: Scale,        color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",  prompt: "I need legal case records with case_id, plaintiff_name, defendant_name, case_type, judge_name, filing_date, hearing_date, status, and verdict." },
-    { id: "HR",           label: "HR / Human Resources",   icon: Users,        color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/30", prompt: "I need employee records for an HR management system with employee_id, first_name, last_name, email, department, designation, joining_date, salary, performance_score, and is_active." },
+    { id: "Healthcare",   label: "Medical / Healthcare",    icon: Stethoscope,  color: "text-rose-400",    bg: "bg-rose-500/10",    border: "border-rose-500/30",    prompt: "I need patient records for medical ML classification with patient_id, name, age, gender, blood_type, disease / diagnosis, medical symptoms, medical cause, medical severity, medical treatment, and treatment_cost." },
+    { id: "Agriculture",  label: "Agriculture / Farming",   icon: Wheat,        color: "text-lime-400",    bg: "bg-lime-500/10",    border: "border-lime-500/30",    prompt: "I need agricultural data for crop yield prediction with crop_type, soil_type, water_source, fertilizer_used, yield_level, growth_period_days, and farm_area_acres." },
+    { id: "Finance",      label: "Finance / Banking",       icon: Landmark,     color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", prompt: "I need transactional record logs for fraud detection with transaction_id, customer_id, transaction_type, merchant_category, amount, card_type, risk_score, and is_fraud." },
+    { id: "Education",    label: "Education / Academia",    icon: GraduationCap,color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/30",    prompt: "I need student records for performance modeling with student_id, name, course / major, study_hours, gpa, graduation_status, and career_path." },
+    { id: "Legal",        label: "Legal / Law",             icon: Scale,        color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",  prompt: "I need litigation case records for case outcome classification with case_id, case_type, verdict / outcome, judge, damages, complexity, and filing_date." },
+    { id: "HR",           label: "HR / Human Resources",   icon: Users,        color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/30", prompt: "I need employee performance records for attrition/salary regression with employee_id, department_name, employee_role, experience_years, performance_rating, and salary." },
     { id: "Retail",       label: "Retail / E-Commerce",    icon: ShoppingCart, color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30", prompt: "I need customer and order records for an e-commerce platform with customer_id, name, email, city, product_name, category, purchase_date, quantity, amount, and order_status." },
     { id: "Manufacturing",label: "Manufacturing / Industry",icon: Factory,      color: "text-slate-400",   bg: "bg-slate-500/10",   border: "border-slate-500/30",  prompt: "I need production records for a manufacturing plant with product_id, product_name, batch_number, production_date, quantity_produced, defect_count, line_id, operator_name, and quality_score." },
     { id: "Logistics",    label: "Logistics / Supply Chain",icon: Truck,        color: "text-cyan-400",    bg: "bg-cyan-500/10",    border: "border-cyan-500/30",   prompt: "I need shipment records for a logistics company with shipment_id, sender_name, receiver_name, origin_city, destination_city, dispatch_date, delivery_date, weight_kg, carrier, and delivery_status." },
     { id: "Research",     label: "Science / Research",      icon: FlaskConical, color: "text-teal-400",    bg: "bg-teal-500/10",    border: "border-teal-500/30",   prompt: "I need research experiment records with experiment_id, researcher_name, project_title, start_date, end_date, sample_size, control_group, treatment_group, outcome_metric, and p_value." },
     { id: "Government",   label: "Government / Public",     icon: Building2,    color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/30",   prompt: "I need citizen service records for a government portal with citizen_id, name, age, gender, state, service_type, application_date, status, officer_name, and resolution_date." },
-    { id: "Technology",   label: "Technology / IT",         icon: Cpu,          color: "text-indigo-400",  bg: "bg-indigo-500/10",  border: "border-indigo-500/30", prompt: "I need IT asset and incident records for a tech company with asset_id, asset_type, assigned_to, purchase_date, warranty_expiry, incident_id, issue_type, priority, raised_date, and resolution_time_hours." },
-    { id: "Environment",  label: "Environment / Climate",   icon: Leaf,         color: "text-green-400",   bg: "bg-green-500/10",   border: "border-green-500/30",  prompt: "I need environmental monitoring records with station_id, location, date, temperature_celsius, humidity_pct, co2_ppm, pm25_level, rainfall_mm, wind_speed_kmh, and air_quality_index." },
-    { id: "Marketing",   label: "Marketing / Analytics",   icon: BarChart3,    color: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/30",   prompt: "I need marketing campaign records with campaign_id, campaign_name, channel, target_audience, start_date, end_date, budget, impressions, clicks, conversions, and roi_pct." },
+    { id: "Technology",   label: "Technology / IT",         icon: Cpu,          color: "text-indigo-400",  bg: "bg-indigo-500/10",  border: "border-indigo-500/30", prompt: "I need IT asset and incident logs for vulnerability assessment with asset_id, asset_type, operating_system, patch_level, and vulnerabilities." },
+    { id: "Environment",  label: "Environment / Climate",   icon: Leaf,         color: "text-green-400",   bg: "bg-green-500/10",   border: "border-green-500/30",  prompt: "I need environmental climate log records for weather prediction with station_id, location_type, temp, humidity, aqi, and carbon_idx." },
+    { id: "Marketing",   label: "Marketing / Analytics",   icon: BarChart3,    color: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/30",   prompt: "I need marketing metrics records for ROI conversion prediction with campaign_id, campaign_type, marketing_channel, budget, roi, and status." },
     { id: "Custom",      label: "Other / Custom Domain",   icon: Globe,        color: "text-primary",     bg: "bg-primary/10",     border: "border-primary/30",    prompt: "" },
   ];
 
