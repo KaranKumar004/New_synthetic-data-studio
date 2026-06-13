@@ -32,7 +32,8 @@ const SUPPORTED_TYPES = [
   "Case Type", "Verdict / Outcome",
   "Department Name", "Employee Role", "Performance Rating",
   "Product Category", "Service Type", "Asset Type", "Operating System",
-  "Location Type", "Campaign Type", "Marketing Channel"
+  "Location Type", "Campaign Type", "Marketing Channel",
+  "Avatar URL", "Product Image URL", "Property Image URL", "Restaurant Image URL", "General Image URL"
 ];
 
 export default function GenerationWizard({ 
@@ -387,9 +388,9 @@ export default function GenerationWizard({
   };
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl xl:max-w-[90%] 2xl:max-w-[95%] mx-auto w-full space-y-6 pb-20 md:pb-8">
+    <div className="flex-1 p-6 sm:p-8 lg:p-12 max-w-7xl xl:max-w-[90%] 2xl:max-w-[95%] mx-auto w-full space-y-8 pb-24 md:pb-12">
       {/* Step Indicator Header */}
-      <div className="glass-panel border border-card-border p-4 sm:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 select-none">
+      <div className="glass-panel border border-card-border p-6 sm:p-8 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 select-none">
         <h1 className="text-xl sm:text-2xl font-black text-foreground">Dataset Wizard</h1>
         
         <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto pb-2 md:pb-0">
@@ -434,7 +435,7 @@ export default function GenerationWizard({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 max-w-6xl mx-auto">
             {DOMAINS.map((domain) => {
               const Icon = domain.icon;
               const isSelected = selectedDomain === domain.id;
@@ -442,7 +443,7 @@ export default function GenerationWizard({
                 <button
                   key={domain.id}
                   onClick={() => handleDomainSelect(domain)}
-                  className={`group relative flex flex-col items-center gap-2.5 p-4 rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer hover:scale-[1.03] ${
+                  className={`group relative flex flex-col items-center gap-3.5 p-6 rounded-3xl border-2 transition-all duration-200 text-center cursor-pointer hover:scale-[1.04] shadow-xs hover:shadow-md ${
                     isSelected
                       ? `${domain.bg} ${domain.border} shadow-lg`
                       : "glass-panel border-card-border hover:border-border"
@@ -510,22 +511,22 @@ export default function GenerationWizard({
 
       {/* STEP 1: MODE SELECTION */}
       {step === 1 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto py-8">
           {/* AI Mode Card */}
           <div 
             onClick={() => { setMode("ai"); setAiModeType("standard"); }}
-            className={`glass-panel border-2 p-6 rounded-2xl cursor-pointer text-center space-y-4 hover:scale-[1.01] transition-all flex flex-col items-center ${
+            className={`glass-panel border-2 p-8 sm:p-10 rounded-3xl cursor-pointer text-center space-y-5 hover:scale-[1.02] hover:shadow-lg transition-all flex flex-col items-center ${
               mode === "ai" && aiModeType === "standard" ? "border-primary shadow-lg shadow-primary/5" : "border-card-border"
             }`}
           >
-            <div className="p-3 bg-primary/10 text-primary rounded-2xl">
+            <div className="p-4 bg-primary/10 text-primary rounded-2xl">
               <Sparkles className="h-8 w-8 animate-pulse-subtle" />
             </div>
             <h3 className="text-xl font-extrabold text-foreground">AI Prompt Generator</h3>
             <p className="text-muted text-[11px] leading-relaxed max-w-sm font-semibold">
               Describe what kind of database you need in plain English, and our AI will automatically draft the schema tables, columns, constraints, and relationships.
             </p>
-            <span className={`px-2 py-0.5 text-[9px] uppercase font-black tracking-widest rounded-md ${
+            <span className={`px-2.5 py-1 text-[9px] uppercase font-black tracking-widest rounded-md ${
               mode === "ai" && aiModeType === "standard" ? "bg-primary/20 text-primary" : "bg-muted-bg text-muted"
             }`}>
               Recommended
@@ -535,18 +536,18 @@ export default function GenerationWizard({
           {/* Manual Mode Card */}
           <div 
             onClick={() => { setMode("manual"); setAiModeType("standard"); }}
-            className={`glass-panel border-2 p-6 rounded-2xl cursor-pointer text-center space-y-4 hover:scale-[1.01] transition-all flex flex-col items-center ${
+            className={`glass-panel border-2 p-8 sm:p-10 rounded-3xl cursor-pointer text-center space-y-5 hover:scale-[1.02] hover:shadow-lg transition-all flex flex-col items-center ${
               mode === "manual" ? "border-primary shadow-lg shadow-primary/5" : "border-card-border"
             }`}
           >
-            <div className="p-3 bg-indigo-500/10 text-indigo-500 rounded-2xl">
+            <div className="p-4 bg-indigo-500/10 text-indigo-500 rounded-2xl">
               <FileText className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-extrabold text-foreground">Manual Dataset Builder</h3>
             <p className="text-muted text-[11px] leading-relaxed max-w-sm font-semibold">
               Define your database columns from scratch. Select data types, configure null rates, specify integer distributions, and link foreign keys manually.
             </p>
-            <span className={`px-2 py-0.5 text-[9px] uppercase font-black tracking-widest rounded-md ${
+            <span className={`px-2.5 py-1 text-[9px] uppercase font-black tracking-widest rounded-md ${
               mode === "manual" ? "bg-indigo-500/20 text-indigo-500" : "bg-muted-bg text-muted"
             }`}>
               Full Customization
@@ -556,18 +557,18 @@ export default function GenerationWizard({
           {/* AI Training Data Synthesizer Card */}
           <div 
             onClick={() => { setMode("ai"); setAiModeType("training"); }}
-            className={`glass-panel border-2 p-6 rounded-2xl cursor-pointer text-center space-y-4 hover:scale-[1.01] transition-all flex flex-col items-center ${
+            className={`glass-panel border-2 p-8 sm:p-10 rounded-3xl cursor-pointer text-center space-y-5 hover:scale-[1.02] hover:shadow-lg transition-all flex flex-col items-center ${
               mode === "ai" && aiModeType === "training" ? "border-primary shadow-lg shadow-primary/5" : "border-card-border"
             }`}
           >
-            <div className="p-3 bg-amber-500/10 text-amber-500 rounded-2xl">
+            <div className="p-4 bg-amber-500/10 text-amber-500 rounded-2xl">
               <Brain className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-extrabold text-foreground">AI Training Synthesizer</h3>
             <p className="text-muted text-[11px] leading-relaxed max-w-sm font-semibold">
               Generate formatted datasets for training LLMs (Instruction Fine-Tuning, QA datasets, Classification records, or custom RAG document contexts).
             </p>
-            <span className={`px-2 py-0.5 text-[9px] uppercase font-black tracking-widest rounded-md ${
+            <span className={`px-2.5 py-1 text-[9px] uppercase font-black tracking-widest rounded-md ${
               mode === "ai" && aiModeType === "training" ? "bg-amber-500/20 text-amber-500" : "bg-muted-bg text-muted"
             }`}>
               AI / LLM Fine-Tuning
@@ -577,18 +578,18 @@ export default function GenerationWizard({
           {/* Synthetic Conversation Generator Card */}
           <div 
             onClick={() => { setMode("ai"); setAiModeType("conversation"); }}
-            className={`glass-panel border-2 p-6 rounded-2xl cursor-pointer text-center space-y-4 hover:scale-[1.01] transition-all flex flex-col items-center ${
+            className={`glass-panel border-2 p-8 sm:p-10 rounded-3xl cursor-pointer text-center space-y-5 hover:scale-[1.02] hover:shadow-lg transition-all flex flex-col items-center ${
               mode === "ai" && aiModeType === "conversation" ? "border-primary shadow-lg shadow-primary/5" : "border-card-border"
             }`}
           >
-            <div className="p-3 bg-purple-500/10 text-purple-500 rounded-2xl">
+            <div className="p-4 bg-purple-500/10 text-purple-500 rounded-2xl">
               <MessageCircle className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-extrabold text-foreground">Conversation Dialogue Logs</h3>
             <p className="text-muted text-[11px] leading-relaxed max-w-sm font-semibold">
               Generate realistic multi-turn chat dialogues between characters (e.g. Doctor-Patient visits, support tickets) formatted in JSONL logs.
             </p>
-            <span className={`px-2 py-0.5 text-[9px] uppercase font-black tracking-widest rounded-md ${
+            <span className={`px-2.5 py-1 text-[9px] uppercase font-black tracking-widest rounded-md ${
               mode === "ai" && aiModeType === "conversation" ? "bg-purple-500/20 text-purple-500" : "bg-muted-bg text-muted"
             }`}>
               Dialogues / JSONL Logs
@@ -625,7 +626,7 @@ export default function GenerationWizard({
         <div className="space-y-6">
           {/* AI Standard input segment */}
           {mode === "ai" && aiModeType === "standard" && tables.length === 1 && tables[0].columns.length === 4 && (
-            <div className="glass-panel border border-card-border p-6 rounded-2xl max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+            <div className="glass-panel border border-card-border p-8 sm:p-10 rounded-3xl max-w-4xl mx-auto space-y-8 animate-fade-in-up">
               <div className="flex gap-3">
                 <div className="p-2.5 bg-primary/10 text-primary rounded-xl shrink-0 h-fit">
                   <Sparkles className="h-5 w-5" />
@@ -668,7 +669,7 @@ export default function GenerationWizard({
 
           {/* AI Training Synthesizer parameters form */}
           {mode === "ai" && aiModeType === "training" && (
-            <div className="glass-panel border border-card-border p-6 sm:p-8 rounded-2xl max-w-2xl mx-auto space-y-6 animate-fade-in-up">
+            <div className="glass-panel border border-card-border p-8 sm:p-10 rounded-3xl max-w-3xl mx-auto space-y-8 animate-fade-in-up">
               <div className="flex gap-3 border-b border-border pb-4">
                 <div className="p-2.5 bg-amber-500/10 text-amber-500 rounded-xl shrink-0">
                   <Brain className="h-6 w-6" />
@@ -749,7 +750,7 @@ export default function GenerationWizard({
 
           {/* AI Dialogue Logs parameters form */}
           {mode === "ai" && aiModeType === "conversation" && (
-            <div className="glass-panel border border-card-border p-6 sm:p-8 rounded-2xl max-w-2xl mx-auto space-y-6 animate-fade-in-up">
+            <div className="glass-panel border border-card-border p-8 sm:p-10 rounded-3xl max-w-3xl mx-auto space-y-8 animate-fade-in-up">
               <div className="flex gap-3 border-b border-border pb-4">
                 <div className="p-2.5 bg-purple-500/10 text-purple-500 rounded-xl shrink-0">
                   <MessageCircle className="h-6 w-6" />
@@ -884,7 +885,7 @@ export default function GenerationWizard({
 
               <div className="space-y-8">
                 {tables.map((table, tIdx) => (
-                  <div key={tIdx} className="glass-panel border border-card-border rounded-2xl overflow-hidden p-6 space-y-4 animate-fade-in-up">
+                  <div key={tIdx} className="glass-panel border border-card-border rounded-3xl overflow-hidden p-8 space-y-6 animate-fade-in-up">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
                       {/* Table metadata controls */}
                       <div className="flex flex-wrap items-center gap-3">
@@ -933,7 +934,7 @@ export default function GenerationWizard({
                         {table.columns.map((col: any, cIdx: number) => {
                           const fkOptions = getForeignKeyOptions(tIdx);
                           return (
-                            <div key={cIdx} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-muted-bg/30 border border-border/50 p-3.5 rounded-xl hover:border-border transition-all">
+                            <div key={cIdx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-muted-bg/30 border border-border/50 p-4.5 rounded-2xl hover:border-border transition-all">
                               {/* Col name */}
                               <div className="col-span-3">
                                 <input
@@ -941,7 +942,8 @@ export default function GenerationWizard({
                                   value={col.name}
                                   onChange={(e) => updateColumn(tIdx, cIdx, "name", e.target.value.toLowerCase().replace(/\s+/g, "_"))}
                                   placeholder="e.g. email"
-                                  className="w-full bg-card border border-border rounded-xl px-3 py-2 text-xs font-bold focus:border-primary outline-hidden"
+                                  className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-xs font-bold focus:border-primary outline-hidden"
+                                  required
                                 />
                               </div>
 
@@ -950,7 +952,7 @@ export default function GenerationWizard({
                                 <select
                                   value={col.type}
                                   onChange={(e) => updateColumn(tIdx, cIdx, "type", e.target.value)}
-                                  className="w-full bg-card border border-border rounded-xl px-3 py-2 text-xs font-semibold outline-hidden cursor-pointer"
+                                  className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-xs font-semibold outline-hidden cursor-pointer"
                                 >
                                   {SUPPORTED_TYPES.map((t) => (
                                     <option key={t}>{t}</option>
@@ -1112,7 +1114,7 @@ export default function GenerationWizard({
 
       {/* STEP 3: QUALITY CONFIGS & TARGET EXPORT FORMAT */}
       {step === 3 && (
-        <div className="glass-panel border border-card-border p-6 sm:p-8 rounded-2xl max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+        <div className="glass-panel border border-card-border p-8 sm:p-10 rounded-3xl max-w-4xl mx-auto space-y-8 animate-fade-in-up">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Settings2 className="h-5 w-5 text-muted" />
             Generation Specifications

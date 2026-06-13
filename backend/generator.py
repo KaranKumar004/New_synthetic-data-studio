@@ -297,6 +297,44 @@ class SyntheticDataEngine:
         elif field_type_clean in ["marketing_channel", "marketingchannel", "channel"]:
             return random.choice(DOMAIN_PRESETS["marketing"])["channel"]
         
+        # Image URL Types
+        elif field_type_clean in ["avatarurl", "avatar", "profileimage"]:
+            # Generate a consistent, unique avatar using Pravatar
+            seed = config.get("seed", str(uuid.uuid4())[:8])
+            return f"https://i.pravatar.cc/150?u={seed}"
+        elif field_type_clean in ["productimageurl", "productimage", "productimg"]:
+            product_images = [
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80"
+            ]
+            return product_images[index % len(product_images)]
+        elif field_type_clean in ["propertyimageurl", "propertyimage", "houseimage"]:
+            house_images = [
+                "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=500&auto=format&fit=crop&q=80"
+            ]
+            return house_images[index % len(house_images)]
+        elif field_type_clean in ["restaurantimageurl", "restaurantimage", "foodimage"]:
+            food_images = [
+                "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&auto=format&fit=crop&q=80"
+            ]
+            return food_images[index % len(food_images)]
+        elif field_type_clean in ["generalimageurl", "imageurl", "image", "img", "photo"]:
+            width = int(config.get("width", 640))
+            height = int(config.get("height", 480))
+            return f"https://picsum.photos/{width}/{height}?random={index}"
+        
         # Fallback to standard word/sentence
         return self.fake.word()
 

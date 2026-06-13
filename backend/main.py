@@ -5,7 +5,7 @@ import hashlib
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, Depends, HTTPException, status, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
 from backend.config import settings
@@ -22,6 +22,7 @@ from backend.generator import RelationalDatasetGenerator, export_data, analyze_d
 from backend.ai_engine import infer_schema_with_ai
 from backend.assistant import answer_dataset_query
 from backend.ai_training_generator import generate_ai_training_data_with_ai, generate_conversation_with_ai
+from backend.image_generator import create_image_dataset_zip
 
 app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0")
 
@@ -57,10 +58,6 @@ def get_current_user_by_api_key(
 
 # Pre-populate industry templates
 def seed_templates(db: Session):
-    existing = db.query(Template).filter(Template.is_system == True).first()
-    if existing:
-        return
-
     industry_presets = [
         # 1. Retail
         {
@@ -76,6 +73,7 @@ def seed_templates(db: Session):
                             {"name": "customer_id", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "CUST-"}},
                             {"name": "name", "type": "Name", "null_pct": 0, "config": {}},
                             {"name": "email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
                             {"name": "age", "type": "Age", "null_pct": 0, "config": {"min": 18, "max": 75}},
                             {"name": "gender", "type": "Gender", "null_pct": 0, "config": {}},
                             {"name": "city", "type": "City", "null_pct": 0, "config": {}},
@@ -114,7 +112,8 @@ def seed_templates(db: Session):
                             {"name": "gender", "type": "Gender", "null_pct": 0, "config": {}},
                             {"name": "blood_type", "type": "Categories", "null_pct": 0, "config": {"categories": ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]}},
                             {"name": "phone", "type": "Phone Number", "null_pct": 0, "config": {}},
-                            {"name": "address", "type": "Address", "null_pct": 0, "config": {}}
+                            {"name": "address", "type": "Address", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}}
                         ]
                     },
                     {
@@ -145,6 +144,7 @@ def seed_templates(db: Session):
                         "columns": [
                             {"name": "account_number", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "ACC-"}},
                             {"name": "owner_name", "type": "Name", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
                             {"name": "account_type", "type": "Categories", "null_pct": 0, "config": {"categories": ["Savings", "Checking", "Credit Card", "Loan"], "weights": [0.5, 0.3, 0.15, 0.05]}},
                             {"name": "balance", "type": "Currency", "null_pct": 0, "config": {"min": 5.0, "max": 250000.0}},
                             {"name": "opened_at", "type": "Date", "null_pct": 0, "config": {"start_date": "-5y", "end_date": "today"}},
@@ -180,6 +180,7 @@ def seed_templates(db: Session):
                             {"name": "first_name", "type": "First Name", "null_pct": 0, "config": {}},
                             {"name": "last_name", "type": "Last Name", "null_pct": 0, "config": {}},
                             {"name": "email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
                             {"name": "department", "type": "Categories", "null_pct": 0, "config": {"categories": ["Engineering", "Product", "Sales", "Marketing", "HR", "Finance"]}},
                             {"name": "joining_date", "type": "Date", "null_pct": 0, "config": {"start_date": "-8y", "end_date": "today"}},
                             {"name": "is_manager", "type": "Boolean", "null_pct": 0, "config": {"true_percentage": 15}}
@@ -198,18 +199,397 @@ def seed_templates(db: Session):
                     }
                 ]
             }
+        },
+        # 5. Retail - E-Commerce
+        {
+            "name": "Retail - E-Commerce Cart Sessions",
+            "description": "Product catalog and active shopping cart sessions.",
+            "industry": "Retail",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "products",
+                        "rows": 40,
+                        "columns": [
+                            {"name": "product_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "product_name", "type": "Product Name", "null_pct": 0, "config": {}},
+                            {"name": "product_image", "type": "Product Image URL", "null_pct": 0, "config": {}},
+                            {"name": "category", "type": "Product Category", "null_pct": 0, "config": {}},
+                            {"name": "price", "type": "Currency", "null_pct": 0, "config": {"min": 10.0, "max": 1500.0}},
+                            {"name": "inventory", "type": "Integer", "null_pct": 0, "config": {"min": 5, "max": 500}}
+                        ]
+                    },
+                    {
+                        "name": "cart_sessions",
+                        "rows": 120,
+                        "columns": [
+                            {"name": "session_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "customer_email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "product_id", "type": "UUID", "null_pct": 0, "config": {"foreign_key": "products.product_id"}},
+                            {"name": "quantity", "type": "Integer", "null_pct": 0, "config": {"min": 1, "max": 5}},
+                            {"name": "added_at", "type": "Datetime", "null_pct": 0, "config": {"start_date": "-30d", "end_date": "today"}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 6. Credit Risk
+        {
+            "name": "Finance - Credit Risk & Loan Applications",
+            "description": "Applicant demographic data, credit scores, and loan evaluation requests.",
+            "industry": "Finance",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "applicants",
+                        "rows": 80,
+                        "columns": [
+                            {"name": "applicant_id", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "APP-"}},
+                            {"name": "name", "type": "Name", "null_pct": 0, "config": {}},
+                            {"name": "email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
+                            {"name": "age", "type": "Age", "null_pct": 0, "config": {"min": 21, "max": 68}},
+                            {"name": "income", "type": "Currency", "null_pct": 0, "config": {"min": 24000.0, "max": 350000.0}},
+                            {"name": "credit_score", "type": "Integer", "null_pct": 0, "config": {"min": 350, "max": 850}}
+                        ]
+                    },
+                    {
+                        "name": "loans",
+                        "rows": 100,
+                        "columns": [
+                            {"name": "loan_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "applicant_id", "type": "Customer ID", "null_pct": 0, "config": {"foreign_key": "applicants.applicant_id"}},
+                            {"name": "loan_amount", "type": "Currency", "null_pct": 0, "config": {"min": 5000.0, "max": 120000.0}},
+                            {"name": "term_months", "type": "Categories", "null_pct": 0, "config": {"categories": ["12", "24", "36", "48", "60"]}},
+                            {"name": "interest_rate", "type": "Float", "null_pct": 0, "config": {"min": 0.04, "max": 0.22, "precision": 3}},
+                            {"name": "status", "type": "Categories", "null_pct": 0, "config": {"categories": ["Approved", "Rejected", "Pending"], "weights": [0.65, 0.25, 0.1]}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 7. Logistics
+        {
+            "name": "Logistics - Warehouses & Shipments",
+            "description": "Inventory hubs and distribution tracking feeds.",
+            "industry": "Logistics",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "warehouses",
+                        "rows": 15,
+                        "columns": [
+                            {"name": "warehouse_id", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "WH-"}},
+                            {"name": "city", "type": "City", "null_pct": 0, "config": {}},
+                            {"name": "state", "type": "State", "null_pct": 0, "config": {}},
+                            {"name": "capacity", "type": "Integer", "null_pct": 0, "config": {"min": 5000, "max": 45000}},
+                            {"name": "warehouse_image", "type": "General Image URL", "null_pct": 0, "config": {}},
+                            {"name": "manager_email", "type": "Email", "null_pct": 0, "config": {}}
+                        ]
+                    },
+                    {
+                        "name": "shipments",
+                        "rows": 150,
+                        "columns": [
+                            {"name": "shipment_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "origin_warehouse", "type": "Customer ID", "null_pct": 0, "config": {"foreign_key": "warehouses.warehouse_id"}},
+                            {"name": "destination_city", "type": "City", "null_pct": 0, "config": {}},
+                            {"name": "carrier", "type": "Categories", "null_pct": 0, "config": {"categories": ["FedEx", "UPS", "DHL", "USPS"]}},
+                            {"name": "ship_date", "type": "Date", "null_pct": 0, "config": {"start_date": "-60d", "end_date": "today"}},
+                            {"name": "delivery_days", "type": "Integer", "null_pct": 0, "config": {"min": 1, "max": 7}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 8. Technology
+        {
+            "name": "Technology - SaaS Organization Subscriptions",
+            "description": "B2B client tenants and billing plans.",
+            "industry": "Technology",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "organizations",
+                        "rows": 40,
+                        "columns": [
+                            {"name": "org_id", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "ORG-"}},
+                            {"name": "org_name", "type": "Company Name", "null_pct": 0, "config": {}},
+                            {"name": "logo", "type": "General Image URL", "null_pct": 0, "config": {}},
+                            {"name": "billing_email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "industry", "type": "Categories", "null_pct": 0, "config": {"categories": ["Healthcare", "Finance", "Education", "Retail", "Services"]}},
+                            {"name": "created_at", "type": "Date", "null_pct": 0, "config": {"start_date": "-3y", "end_date": "-30d"}}
+                        ]
+                    },
+                    {
+                        "name": "subscriptions",
+                        "rows": 40,
+                        "columns": [
+                            {"name": "sub_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "org_id", "type": "Customer ID", "null_pct": 0, "config": {"foreign_key": "organizations.org_id"}},
+                            {"name": "plan_name", "type": "Categories", "null_pct": 0, "config": {"categories": ["Free", "Growth", "Enterprise"]}},
+                            {"name": "monthly_price", "type": "Currency", "null_pct": 0, "config": {"min": 0.0, "max": 999.0}},
+                            {"name": "active", "type": "Boolean", "null_pct": 0, "config": {"true_percentage": 85}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 9. Education
+        {
+            "name": "Education - Student Enrollments & Grades",
+            "description": "Academic records, enrolled courses, and grade distributions.",
+            "industry": "Education",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "students",
+                        "rows": 100,
+                        "columns": [
+                            {"name": "student_id", "type": "Employee ID", "null_pct": 0, "config": {"prefix": "STU-"}},
+                            {"name": "first_name", "type": "First Name", "null_pct": 0, "config": {}},
+                            {"name": "last_name", "type": "Last Name", "null_pct": 0, "config": {}},
+                            {"name": "email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
+                            {"name": "gpa", "type": "Float", "null_pct": 0, "config": {"min": 1.5, "max": 4.0, "precision": 2}}
+                        ]
+                    },
+                    {
+                        "name": "enrollments",
+                        "rows": 250,
+                        "columns": [
+                            {"name": "enrollment_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "student_id", "type": "Employee ID", "null_pct": 0, "config": {"foreign_key": "students.student_id"}},
+                            {"name": "course_name", "type": "Course / Major", "null_pct": 0, "config": {}},
+                            {"name": "semester", "type": "Categories", "null_pct": 0, "config": {"categories": ["Fall 2025", "Spring 2026", "Summer 2026"]}},
+                            {"name": "grade", "type": "Categories", "null_pct": 0, "config": {"categories": ["A", "B", "C", "D", "F"], "weights": [0.35, 0.4, 0.17, 0.05, 0.03]}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 10. Environment (IoT)
+        {
+            "name": "Environment - IoT Sensor Telemetry",
+            "description": "Climatology nodes, air quality metrics, and telemetry timestamp series.",
+            "industry": "Environment",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "devices",
+                        "rows": 20,
+                        "columns": [
+                            {"name": "device_id", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "DEV-"}},
+                            {"name": "location", "type": "City", "null_pct": 0, "config": {}},
+                            {"name": "device_type", "type": "Categories", "null_pct": 0, "config": {"categories": ["Thermometer", "Hygrometer", "AirQualityMeter"]}},
+                            {"name": "device_photo", "type": "General Image URL", "null_pct": 0, "config": {}},
+                            {"name": "operator_email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "installed_on", "type": "Date", "null_pct": 0, "config": {"start_date": "-2y", "end_date": "today"}}
+                        ]
+                    },
+                    {
+                        "name": "telemetry",
+                        "rows": 400,
+                        "columns": [
+                            {"name": "reading_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "device_id", "type": "Customer ID", "null_pct": 0, "config": {"foreign_key": "devices.device_id"}},
+                            {"name": "temperature", "type": "Float", "null_pct": 0, "config": {"min": -15.0, "max": 48.0, "precision": 1}},
+                            {"name": "humidity", "type": "Float", "null_pct": 0, "config": {"min": 5.0, "max": 99.0, "precision": 1}},
+                            {"name": "aqi", "type": "Integer", "null_pct": 0, "config": {"min": 10, "max": 250}},
+                            {"name": "recorded_at", "type": "Datetime", "null_pct": 0, "config": {"start_date": "-15d", "end_date": "today"}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 11. Social Media
+        {
+            "name": "Social Media - Content & Likes",
+            "description": "User profile streams, posts, and post interaction metrics.",
+            "industry": "Social Media",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "users",
+                        "rows": 60,
+                        "columns": [
+                            {"name": "user_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "username", "type": "Name", "null_pct": 0, "config": {}},
+                            {"name": "email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
+                            {"name": "joined_at", "type": "Date", "null_pct": 0, "config": {"start_date": "-4y", "end_date": "today"}},
+                            {"name": "followers", "type": "Integer", "null_pct": 0, "config": {"min": 50, "max": 85000}}
+                        ]
+                    },
+                    {
+                        "name": "posts",
+                        "rows": 180,
+                        "columns": [
+                            {"name": "post_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "user_id", "type": "UUID", "null_pct": 0, "config": {"foreign_key": "users.user_id"}},
+                            {"name": "content", "type": "Custom Text", "null_pct": 0, "config": {"sentences": 3}},
+                            {"name": "post_image", "type": "General Image URL", "null_pct": 15, "config": {}},
+                            {"name": "likes", "type": "Integer", "null_pct": 0, "config": {"min": 0, "max": 12000}},
+                            {"name": "shares", "type": "Integer", "null_pct": 0, "config": {"min": 0, "max": 850}},
+                            {"name": "created_at", "type": "Datetime", "null_pct": 0, "config": {"start_date": "-30d", "end_date": "today"}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 12. Real Estate
+        {
+            "name": "Real Estate - Property Listings",
+            "description": "Property dimensions and catalog listings under agents.",
+            "industry": "Real Estate",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "properties",
+                        "rows": 40,
+                        "columns": [
+                            {"name": "property_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "address", "type": "Address", "null_pct": 0, "config": {}},
+                            {"name": "city", "type": "City", "null_pct": 0, "config": {}},
+                            {"name": "state", "type": "State", "null_pct": 0, "config": {}},
+                            {"name": "property_type", "type": "Categories", "null_pct": 0, "config": {"categories": ["Single Family", "Condo", "Townhouse", "Apartment"]}},
+                            {"name": "beds", "type": "Integer", "null_pct": 0, "config": {"min": 1, "max": 5}},
+                            {"name": "baths", "type": "Float", "null_pct": 0, "config": {"min": 1.0, "max": 4.0, "precision": 1}},
+                            {"name": "property_image", "type": "Property Image URL", "null_pct": 0, "config": {}}
+                        ]
+                    },
+                    {
+                        "name": "listings",
+                        "rows": 40,
+                        "columns": [
+                            {"name": "listing_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "property_id", "type": "UUID", "null_pct": 0, "config": {"foreign_key": "properties.property_id"}},
+                            {"name": "price", "type": "Currency", "null_pct": 0, "config": {"min": 120000.0, "max": 1800000.0}},
+                            {"name": "agent_name", "type": "Name", "null_pct": 0, "config": {}},
+                            {"name": "agent_email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "status", "type": "Categories", "null_pct": 0, "config": {"categories": ["Active", "Pending", "Sold"]}},
+                            {"name": "listed_date", "type": "Date", "null_pct": 0, "config": {"start_date": "-90d", "end_date": "today"}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 13. Food & Beverage
+        {
+            "name": "Food & Beverage - Restaurant Delivery",
+            "description": "Establishment listings and client delivery order registers.",
+            "industry": "Food & Beverage",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "restaurants",
+                        "rows": 25,
+                        "columns": [
+                            {"name": "restaurant_id", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "REST-"}},
+                            {"name": "name", "type": "Company Name", "null_pct": 0, "config": {}},
+                            {"name": "restaurant_image", "type": "Restaurant Image URL", "null_pct": 0, "config": {}},
+                            {"name": "cuisine", "type": "Categories", "null_pct": 0, "config": {"categories": ["Italian", "Mexican", "Japanese", "American", "Indian", "Chinese"]}},
+                            {"name": "city", "type": "City", "null_pct": 0, "config": {}},
+                            {"name": "rating", "type": "Float", "null_pct": 0, "config": {"min": 3.0, "max": 5.0, "precision": 1}}
+                        ]
+                    },
+                    {
+                        "name": "orders",
+                        "rows": 150,
+                        "columns": [
+                            {"name": "order_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "restaurant_id", "type": "Customer ID", "null_pct": 0, "config": {"foreign_key": "restaurants.restaurant_id"}},
+                            {"name": "customer_name", "type": "Name", "null_pct": 0, "config": {}},
+                            {"name": "customer_email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "order_value", "type": "Currency", "null_pct": 0, "config": {"min": 15.0, "max": 180.0}},
+                            {"name": "delivery_fee", "type": "Currency", "null_pct": 0, "config": {"min": 0.0, "max": 12.0}},
+                            {"name": "payment_method", "type": "Categories", "null_pct": 0, "config": {"categories": ["Credit Card", "Apple Pay", "Google Pay", "Cash"]}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 14. Legal
+        {
+            "name": "Legal - Attorney Caseloads",
+            "description": "Attorney staffing profiles and client litigation cases.",
+            "industry": "Legal",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "attorneys",
+                        "rows": 20,
+                        "columns": [
+                            {"name": "attorney_id", "type": "Employee ID", "null_pct": 0, "config": {"prefix": "ATT-"}},
+                            {"name": "name", "type": "Name", "null_pct": 0, "config": {}},
+                            {"name": "email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "avatar", "type": "Avatar URL", "null_pct": 0, "config": {}},
+                            {"name": "specialty", "type": "Categories", "null_pct": 0, "config": {"categories": ["Corporate", "Criminal", "Family", "Intellectual Property", "Real Estate"]}},
+                            {"name": "hourly_rate", "type": "Currency", "null_pct": 0, "config": {"min": 180.0, "max": 550.0}}
+                        ]
+                    },
+                    {
+                        "name": "cases",
+                        "rows": 60,
+                        "columns": [
+                            {"name": "case_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "attorney_id", "type": "Employee ID", "null_pct": 0, "config": {"foreign_key": "attorneys.attorney_id"}},
+                            {"name": "case_type", "type": "Case Type", "null_pct": 0, "config": {}},
+                            {"name": "status", "type": "Categories", "null_pct": 0, "config": {"categories": ["Open", "Closed", "On Hold"]}},
+                            {"name": "filing_date", "type": "Date", "null_pct": 0, "config": {"start_date": "-3y", "end_date": "today"}}
+                        ]
+                    }
+                ]
+            }
+        },
+        # 15. Automotive
+        {
+            "name": "Automotive - Telematics Logs",
+            "description": "Connected vehicle hardware specs and GPS/telematics sensor tracking series.",
+            "industry": "Automotive",
+            "schema_definition": {
+                "tables": [
+                    {
+                        "name": "vehicles",
+                        "rows": 30,
+                        "columns": [
+                            {"name": "vehicle_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "vin", "type": "Customer ID", "null_pct": 0, "config": {"prefix": "1HG-"}},
+                            {"name": "owner_email", "type": "Email", "null_pct": 0, "config": {}},
+                            {"name": "vehicle_photo", "type": "General Image URL", "null_pct": 0, "config": {}},
+                            {"name": "make", "type": "Categories", "null_pct": 0, "config": {"categories": ["Tesla", "Toyota", "Ford", "BMW", "Honda"]}},
+                            {"name": "model", "type": "Categories", "null_pct": 0, "config": {"categories": ["Model 3", "Camry", "F-150", "3-Series", "Civic"]}},
+                            {"name": "year", "type": "Integer", "null_pct": 0, "config": {"min": 2018, "max": 2026}}
+                        ]
+                    },
+                    {
+                        "name": "trip_logs",
+                        "rows": 300,
+                        "columns": [
+                            {"name": "log_id", "type": "UUID", "null_pct": 0, "config": {}},
+                            {"name": "vehicle_id", "type": "UUID", "null_pct": 0, "config": {"foreign_key": "vehicles.vehicle_id"}},
+                            {"name": "speed_kmh", "type": "Integer", "null_pct": 0, "config": {"min": 0, "max": 140}},
+                            {"name": "fuel_level_pct", "type": "Float", "null_pct": 0, "config": {"min": 0.0, "max": 100.0, "precision": 1}},
+                            {"name": "duration_minutes", "type": "Integer", "null_pct": 0, "config": {"min": 5, "max": 300}},
+                            {"name": "timestamp", "type": "Datetime", "null_pct": 0, "config": {"start_date": "-30d", "end_date": "today"}}
+                        ]
+                    }
+                ]
+            }
         }
     ]
 
     for p in industry_presets:
-        temp = Template(
-            name=p["name"],
-            description=p["description"],
-            industry=p["industry"],
-            schema_definition=p["schema_definition"],
-            is_system=True
-        )
-        db.add(temp)
+        existing = db.query(Template).filter(Template.name == p["name"], Template.is_system == True).first()
+        if not existing:
+            temp = Template(
+                name=p["name"],
+                description=p["description"],
+                industry=p["industry"],
+                schema_definition=p["schema_definition"],
+                is_system=True
+            )
+            db.add(temp)
     db.commit()
 
 @app.on_event("startup")
@@ -1333,3 +1713,60 @@ def get_payment_history(
         }
         for p in payments
     ]
+
+@app.post("/api/generate-image-dataset")
+def generate_image_dataset(
+    dataset_type: str = Query(...), # shapes, ocr, colors, barcodes, signs, captcha, plates, digital, aruco, ecg, chess
+    num_images_per_class: int = Query(50),
+    image_size: int = Query(128),
+    noise_level: str = Query("none"), # none, low, high
+    split_ratio: float = Query(0.8),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    dataset_type_lower = dataset_type.lower()
+    classes_count = {
+        "shapes": 3, "ocr": 10, "colors": 3, "barcodes": 2, "signs": 3,
+        "captcha": 3, "plates": 3, "digital": 10, "aruco": 3, "ecg": 3, "chess": 3
+    }
+    
+    if dataset_type_lower not in classes_count:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Unsupported or disabled dataset type '{dataset_type}'."
+        )
+
+    num_classes = classes_count[dataset_type_lower]
+    total_images = num_images_per_class * num_classes
+
+    if current_user.rows_generated_this_month + total_images > current_user.max_rows_limit:
+        raise HTTPException(status_code=400, detail="Row quota limit exceeded.")
+
+    try:
+        zip_buffer = create_image_dataset_zip(
+            dataset_type=dataset_type,
+            num_images_per_class=num_images_per_class,
+            size=image_size,
+            noise_level=noise_level,
+            split_ratio=split_ratio
+        )
+        
+        # Deduct quota
+        current_user.rows_generated_this_month += total_images
+        
+        log = AuditLog(
+            user_id=current_user.id,
+            action="GENERATE_IMAGE_DATASET",
+            details=f"Generated {total_images} images of type '{dataset_type}' with size {image_size}x{image_size}."
+        )
+        db.add(log)
+        db.commit()
+
+        # Stream ZIP to frontend
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={"Content-Disposition": f"attachment; filename=synthetic_image_{dataset_type}.zip"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate image dataset: {str(e)}")

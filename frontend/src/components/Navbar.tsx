@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, BarChart2, FilePlus, Bookmark, History, Key, Users, Shield, LogOut, Sun, Moon, Menu, X, ShoppingBag, FileText, CreditCard, Zap } from "lucide-react";
+import { Sparkles, BarChart2, FilePlus, Bookmark, History, Key, Users, Shield, LogOut, Sun, Moon, Menu, X, ShoppingBag, FileText, CreditCard, Zap, Image as ImageIcon } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface NavbarProps {
@@ -49,6 +49,7 @@ export default function Navbar({ currentTab, setCurrentTab, user, onLogout }: Na
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart2 },
     { id: "wizard", label: "Generate Data", icon: FilePlus },
+    { id: "image-studio", label: "Image Studio", icon: ImageIcon },
     { id: "templates", label: "Templates", icon: Bookmark },
     { id: "prompts", label: "Prompt Library", icon: FileText },
     { id: "marketplace", label: "Marketplace", icon: ShoppingBag },

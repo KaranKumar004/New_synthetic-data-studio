@@ -13,6 +13,7 @@ import AdminPanel from "@/components/AdminPanel";
 import SavedPrompts from "@/components/SavedPrompts";
 import DatasetMarketplace from "@/components/DatasetMarketplace";
 import PricingPage from "@/components/PricingPage";
+import ImageDatasetGenerator from "@/components/ImageDatasetGenerator";
 import { api, getStoredToken } from "@/lib/api";
 
 export default function Home() {
@@ -128,6 +129,10 @@ export default function Home() {
             setCurrentTab={setCurrentTab} 
             setSelectedTemplateSchema={setSelectedTemplateSchema} 
           />
+        )}
+
+        {currentTab === "image-studio" && (
+          <ImageDatasetGenerator user={user} />
         )}
 
         {currentTab === "history" && (

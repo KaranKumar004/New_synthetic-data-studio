@@ -284,5 +284,22 @@ export const api = {
   async getPaymentHistory(): Promise<any[]> {
     return apiFetch("/api/billing/history");
   },
+
+  async generateImageDataset(
+    datasetType: string,
+    numImagesPerClass: number,
+    imageSize: number,
+    noiseLevel: string,
+    splitRatio: number
+  ): Promise<Blob> {
+    return apiFetch(
+      `/api/generate-image-dataset?dataset_type=${encodeURIComponent(
+        datasetType
+      )}&num_images_per_class=${numImagesPerClass}&image_size=${imageSize}&noise_level=${noiseLevel}&split_ratio=${splitRatio}`,
+      {
+        method: "POST",
+      }
+    );
+  },
 };
 

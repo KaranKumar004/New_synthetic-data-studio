@@ -17,7 +17,8 @@ SUPPORTED_TYPES = [
     "Case Type", "Verdict / Outcome",
     "Department Name", "Employee Role", "Performance Rating",
     "Product Category", "Service Type", "Asset Type", "Operating System",
-    "Location Type", "Campaign Type", "Marketing Channel"
+    "Location Type", "Campaign Type", "Marketing Channel",
+    "Avatar URL", "Product Image URL", "Property Image URL", "Restaurant Image URL", "General Image URL"
 ]
 
 SYSTEM_PROMPT = f"""

@@ -147,7 +147,7 @@ export default function PricingPage({ user, onPlanUpgrade }: PricingPageProps) {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl xl:max-w-[90%] 2xl:max-w-[95%] mx-auto w-full space-y-10 pb-20 md:pb-8">
+    <div className="flex-1 p-6 sm:p-8 lg:p-12 max-w-7xl xl:max-w-[90%] 2xl:max-w-[95%] mx-auto w-full space-y-12 pb-24 md:pb-12">
 
       {/* Header */}
       <div className="text-center space-y-4">
@@ -194,7 +194,7 @@ export default function PricingPage({ user, onPlanUpgrade }: PricingPageProps) {
       )}
 
       {/* Pricing Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
         {(plans.length > 0 ? plans : FALLBACK_PLANS).map((plan) => {
           const Icon = PLAN_ICONS[plan.id] || Sparkles;
           const isCurrent = currentPlan === plan.id;
@@ -206,7 +206,7 @@ export default function PricingPage({ user, onPlanUpgrade }: PricingPageProps) {
           return (
             <div
               key={plan.id}
-              className={`relative flex flex-col rounded-3xl border-2 bg-gradient-to-br p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${gradient} ${
+              className={`relative flex flex-col rounded-3xl border-2 bg-gradient-to-br p-8 transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl ${gradient} ${
                 isCurrent ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
               }`}
             >

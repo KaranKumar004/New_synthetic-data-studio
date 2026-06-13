@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { Sparkles, LayoutGrid, HeartPulse, Landmark, ShoppingBag, GraduationCap, Truck, UserCheck, ChevronRight } from "lucide-react";
+import { 
+  Sparkles, LayoutGrid, HeartPulse, Landmark, ShoppingBag, GraduationCap, 
+  Truck, UserCheck, ChevronRight, Coins, Leaf, Users, Home, Utensils, Scale, Car, Laptop 
+} from "lucide-react";
 
 interface TemplatesGalleryProps {
   setCurrentTab: (tab: string) => void;
@@ -30,16 +33,28 @@ export default function TemplatesGallery({ setCurrentTab, setSelectedTemplateSch
     }
   };
 
-  const categories = ["All", "Healthcare", "Banking", "Retail", "Education", "Logistics", "HR"];
+  const categories = [
+    "All", "Retail", "Healthcare", "Banking", "Finance", "HR", 
+    "Logistics", "Technology", "Education", "Environment", 
+    "Social Media", "Real Estate", "Food & Beverage", "Legal", "Automotive"
+  ];
 
   const getIcon = (industry: string) => {
     switch (industry.toLowerCase()) {
       case "healthcare": return HeartPulse;
       case "banking": return Landmark;
+      case "finance": return Coins;
       case "retail": return ShoppingBag;
       case "education": return GraduationCap;
       case "logistics": return Truck;
       case "hr": return UserCheck;
+      case "technology": return Laptop;
+      case "environment": return Leaf;
+      case "social media": return Users;
+      case "real estate": return Home;
+      case "food & beverage": return Utensils;
+      case "legal": return Scale;
+      case "automotive": return Car;
       default: return LayoutGrid;
     }
   };
@@ -63,23 +78,23 @@ export default function TemplatesGallery({ setCurrentTab, setSelectedTemplateSch
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl xl:max-w-[90%] 2xl:max-w-[95%] mx-auto w-full space-y-6 pb-20 md:pb-8">
+    <div className="flex-1 p-6 sm:p-8 lg:p-12 max-w-7xl xl:max-w-[90%] 2xl:max-w-[95%] mx-auto w-full space-y-8 pb-24 md:pb-12 font-sans">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight">Templates Gallery</h1>
-        <p className="text-muted text-sm mt-1 font-medium">
+        <p className="text-muted text-sm mt-1.5 font-medium">
           Choose a pre-designed database template and populate it with realistic relational mock data.
         </p>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-border pb-4 overflow-x-auto">
+      <div className="flex flex-wrap gap-3 border-b border-border pb-6 overflow-x-auto">
         {categories.map((cat) => {
           const Icon = getIcon(cat);
           return (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${
                 filter === cat
                   ? "bg-primary text-white shadow-md shadow-primary/10"
                   : "text-muted hover:text-foreground hover:bg-muted-bg border border-border"
@@ -93,21 +108,21 @@ export default function TemplatesGallery({ setCurrentTab, setSelectedTemplateSch
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {filteredTemplates.map((tpl) => {
           const Icon = getIcon(tpl.industry);
           const tables = tpl.schema_definition?.tables || [];
           return (
             <div
               key={tpl.id}
-              className="glass-panel border border-card-border p-6 rounded-2xl flex flex-col justify-between hover:border-primary/30 transition-all group"
+              className="glass-panel glass-panel-hover border border-card-border p-8 rounded-3xl flex flex-col justify-between group"
             >
               <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
+                <div className="flex justify-between items-start mb-5">
+                  <div className="p-3.5 bg-primary/10 text-primary rounded-xl">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest bg-muted-bg text-muted px-2.5 py-1 rounded-md">
+                  <span className="text-[10px] uppercase font-bold tracking-widest bg-muted-bg text-muted px-3 py-1 rounded-md">
                     {tpl.industry}
                   </span>
                 </div>
@@ -120,7 +135,7 @@ export default function TemplatesGallery({ setCurrentTab, setSelectedTemplateSch
                 </p>
 
                 {/* Schema display */}
-                <div className="mt-4 space-y-2">
+                <div className="mt-5 space-y-2">
                   <span className="text-[10px] uppercase font-black tracking-widest text-muted">
                     Database Schema
                   </span>
@@ -139,7 +154,7 @@ export default function TemplatesGallery({ setCurrentTab, setSelectedTemplateSch
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-border flex justify-end">
+              <div className="mt-6 pt-5 border-t border-border flex justify-end">
                 <button
                   onClick={() => handleUseTemplate(tpl.schema_definition)}
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-primary/10 group-hover:shadow-primary/20 cursor-pointer"
