@@ -1,8 +1,11 @@
 import datetime
+import urllib.request
+import json
+import base64
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
+from jose import jwt, jwk, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from backend.config import settings
@@ -29,43 +32,70 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
+# JWKS cache for Supabase public keys (especially ES256)
+_jwks_cache = {}
+
+def get_supabase_jwk(kid: str) -> Optional[dict]:
+    global _jwks_cache
+    if kid in _jwks_cache:
+        return _jwks_cache[kid]
+    
+    url = f"{settings.SUPABASE_URL or 'https://drdhdaawvtpzmjvczewr.supabase.co'}/auth/v1/.well-known/jwks.json"
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            jwks = json.loads(response.read().decode())
+            for key in jwks.get("keys", []):
+                _jwks_cache[key["kid"]] = key
+    except Exception as e:
+        print(f"DEBUG auth: Error fetching Supabase JWKS from {url}: {e}")
+        
+    return _jwks_cache.get(kid)
+
 def decode_token(token: str) -> Optional[dict]:
     try:
-        # Print debug state
-        print(f"DEBUG auth: SUPABASE_JWT_SECRET is set={bool(settings.SUPABASE_JWT_SECRET)}, len={len(settings.SUPABASE_JWT_SECRET) if settings.SUPABASE_JWT_SECRET else 0}")
-        
-        # Print token header for debugging
+        # Get unverified header to check alg and kid
+        alg = None
+        kid = None
         try:
-            token_header = jwt.get_unverified_header(token)
-            print(f"DEBUG auth: Incoming token header: {token_header}")
+            header = jwt.get_unverified_header(token)
+            alg = header.get("alg")
+            kid = header.get("kid")
+            print(f"DEBUG auth: Incoming token header: {header}")
         except Exception as e:
-            print(f"DEBUG auth: Failed to get unverified header: {e}")
+            print(f"DEBUG auth: Failed to read token header: {e}")
 
-        # Check if we should try to decode with Supabase JWT secret
-        if settings.SUPABASE_JWT_SECRET:
+        # 1. Try Supabase verification if kid is present and alg is ES256
+        if kid and alg == "ES256":
             try:
-                # Supabase JWT secrets are base64-encoded. We decode them to raw bytes to verify HS256 tokens.
-                import base64
+                jwk_data = get_supabase_jwk(kid)
+                if jwk_data:
+                    key = jwk.construct(jwk_data)
+                    payload = jwt.decode(token, key, algorithms=["ES256"], audience="authenticated")
+                    return payload
+                else:
+                    print(f"DEBUG auth: No matching JWK found for kid={kid}")
+            except JWTError as e:
+                print(f"DEBUG auth: Supabase ES256 verification failed: {e}")
+
+        # 2. Fallback to HS256 using SUPABASE_JWT_SECRET if alg is HS256
+        if settings.SUPABASE_JWT_SECRET and alg == "HS256":
+            try:
                 try:
-                    # Pad the secret if necessary
                     padded_secret = settings.SUPABASE_JWT_SECRET
                     missing_padding = len(padded_secret) % 4
                     if missing_padding:
                         padded_secret += '=' * (4 - missing_padding)
                     secret_bytes = base64.b64decode(padded_secret)
                 except Exception as e:
-                    print(f"Supabase JWT base64 decode failed: {e}")
                     secret_bytes = settings.SUPABASE_JWT_SECRET.encode()
-
-                # Supabase tokens are signed with the HS256 algorithm and the JWT secret
+                
                 payload = jwt.decode(token, secret_bytes, algorithms=["HS256"], audience="authenticated")
                 return payload
             except JWTError as e:
-                print(f"Supabase JWT decode failed: {e}")
-                # If Supabase decoding fails, fall back to our local key
-                pass
-        
-        # Local JWT decoding
+                print(f"DEBUG auth: Supabase HS256 verification failed: {e}")
+
+        # 3. Fallback to Local JWT decoding (HS256 using local SECRET_KEY)
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             return payload
