@@ -14,7 +14,8 @@ import SavedPrompts from "@/components/SavedPrompts";
 import DatasetMarketplace from "@/components/DatasetMarketplace";
 import PricingPage from "@/components/PricingPage";
 import ImageDatasetGenerator from "@/components/ImageDatasetGenerator";
-import { api, getStoredToken } from "@/lib/api";
+import { api, getStoredToken, setStoredToken } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,6 +29,21 @@ export default function Home() {
 
   useEffect(() => {
     checkAuthStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        setStoredToken(session.access_token);
+        await checkAuthStatus();
+      } else if (event === "SIGNED_OUT") {
+        setStoredToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const checkAuthStatus = async () => {
@@ -55,7 +71,12 @@ export default function Home() {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("Failed to sign out of Supabase", e);
+    }
     setUser(null);
     setIsAuthenticated(false);
     setCurrentTab("dashboard");

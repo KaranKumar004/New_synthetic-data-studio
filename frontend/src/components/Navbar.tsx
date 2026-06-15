@@ -60,7 +60,13 @@ export default function Navbar({ currentTab, setCurrentTab, user, onLogout }: Na
   ];
 
   // Include admin tab if logged in as admin or demo
-  if (user && (user.email === "demo@syntheticstudio.ai" || user.email?.includes("admin"))) {
+  const isAdmin = user && (
+    user.email === "demo@syntheticstudio.ai" ||
+    user.email?.includes("admin") ||
+    user.email === "karankumarsk14@gmail.com" ||
+    user.email === "karan.kumar@gmail.com"
+  );
+  if (isAdmin) {
     navItems.push({ id: "admin", label: "Admin Panel", icon: Shield });
   }
 

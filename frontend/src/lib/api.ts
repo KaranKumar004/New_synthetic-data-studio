@@ -182,6 +182,10 @@ export const api = {
     return apiFetch("/api/admin/stats");
   },
 
+  async getAdminUsers(): Promise<any[]> {
+    return apiFetch("/api/admin/users");
+  },
+
   // AI Assistant
   async queryAssistant(datasetId: string, message: string): Promise<any> {
     return apiFetch(`/api/datasets/${datasetId}/assistant`, {

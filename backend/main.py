@@ -1090,8 +1090,20 @@ def revoke_api_key(key_id: str, current_user: User = Depends(get_current_user), 
 
 # --- Admin Panel Route ---
 
+def is_admin_user(email: str) -> bool:
+    email_clean = email.lower()
+    return (
+        email_clean == "demo@syntheticstudio.ai"
+        or "admin" in email_clean
+        or email_clean == "karankumarsk14@gmail.com"
+        or email_clean == "karan.kumar@gmail.com"
+    )
+
 @app.get("/api/admin/stats")
-def get_admin_stats(db: Session = Depends(get_db)):
+def get_admin_stats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not is_admin_user(current_user.email):
+        raise HTTPException(status_code=403, detail="Not authorized as administrator")
+        
     total_users = db.query(User).count()
     total_datasets = db.query(Dataset).count()
     total_rows = db.query(Dataset.row_count).all()
@@ -1110,6 +1122,26 @@ def get_admin_stats(db: Session = Depends(get_db)):
         "plan_distribution": plans,
         "system_status": "healthy"
     }
+
+@app.get("/api/admin/users")
+def get_admin_users(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not is_admin_user(current_user.email):
+        raise HTTPException(status_code=403, detail="Not authorized as administrator")
+        
+    users = db.query(User).order_by(User.created_at.desc()).all()
+    return [
+        {
+            "id": u.id,
+            "email": u.email,
+            "plan": u.plan,
+            "rows_generated_this_month": u.rows_generated_this_month,
+            "max_rows_limit": u.max_rows_limit,
+            "monthly_api_calls": u.monthly_api_calls,
+            "max_api_limit": u.max_api_limit,
+            "created_at": u.created_at.isoformat() if u.created_at else None
+        }
+        for u in users
+    ]
 
 # --- Saved Prompts Library Routes ---
 

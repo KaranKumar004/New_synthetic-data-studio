@@ -7,6 +7,7 @@ import { Shield, Users, Database, Percent, Terminal, RefreshCw, CheckCircle2 } f
 export default function AdminPanel() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<any[]>([]);
   const [logs, setLogs] = useState([
     { timestamp: "2026-06-06T11:15:02Z", level: "INFO", message: "FastAPI server started on http://0.0.0.0:8000" },
     { timestamp: "2026-06-06T11:15:32Z", level: "INFO", message: "Connection to SQLite database established successfully" },
@@ -24,19 +25,14 @@ export default function AdminPanel() {
     try {
       const data = await api.getAdminStats();
       setStats(data);
+      const userData = await api.getAdminUsers();
+      setUsers(userData);
     } catch (err) {
       console.error("Failed to load admin stats", err);
     } finally {
       setLoading(false);
     }
   };
-
-  const simulatedUsers = [
-    { email: "demo@syntheticstudio.ai", plan: "free", rows: 4500, limit: 5000 },
-    { email: "enterprise-team@microsoft.com", plan: "enterprise", rows: 752000, limit: 10000000 },
-    { email: "developer.bob@gmail.com", plan: "starter", rows: 89000, limit: 100000 },
-    { email: "test-account@tesla.com", plan: "pro", rows: 12000, limit: 1000000 }
-  ];
 
   if (loading) {
     return (
@@ -127,8 +123,8 @@ export default function AdminPanel() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs font-medium">
-                {simulatedUsers.map((u) => (
-                  <tr key={u.email} className="hover:bg-muted-bg/30">
+                {users.map((u) => (
+                  <tr key={u.id || u.email} className="hover:bg-muted-bg/30">
                     <td className="py-3.5 pr-2 text-foreground font-bold">{u.email}</td>
                     <td className="py-3.5 pr-2">
                       <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase ${
@@ -144,12 +140,12 @@ export default function AdminPanel() {
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-24 bg-muted-bg rounded-full overflow-hidden shrink-0">
                           <div
-                            style={{ width: `${Math.min(100, (u.rows / u.limit) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (u.rows_generated_this_month / u.max_rows_limit) * 100)}%` }}
                             className="h-full bg-primary rounded-full"
                           />
                         </div>
                         <span className="text-[10px] text-muted font-bold">
-                          {u.rows.toLocaleString()} / {u.limit.toLocaleString()} rows
+                          {(u.rows_generated_this_month || 0).toLocaleString()} / {(u.max_rows_limit || 5000).toLocaleString()} rows
                         </span>
                       </div>
                     </td>
