@@ -43,20 +43,27 @@ def decode_token(token: str) -> Optional[dict]:
                     if missing_padding:
                         padded_secret += '=' * (4 - missing_padding)
                     secret_bytes = base64.b64decode(padded_secret)
-                except Exception:
+                except Exception as e:
+                    print(f"Supabase JWT base64 decode failed: {e}")
                     secret_bytes = settings.SUPABASE_JWT_SECRET.encode()
 
                 # Supabase tokens are signed with the HS256 algorithm and the JWT secret
                 payload = jwt.decode(token, secret_bytes, algorithms=["HS256"], audience="authenticated")
                 return payload
-            except JWTError:
+            except JWTError as e:
+                print(f"Supabase JWT decode failed: {e}")
                 # If Supabase decoding fails, fall back to our local key
                 pass
         
         # Local JWT decoding
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        return payload
-    except JWTError:
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            return payload
+        except JWTError as e:
+            print(f"Local JWT decode failed: {e}")
+            return None
+    except Exception as e:
+        print(f"General JWT decoding error: {e}")
         return None
 
 def get_current_user(
