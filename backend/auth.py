@@ -34,6 +34,13 @@ def decode_token(token: str) -> Optional[dict]:
         # Print debug state
         print(f"DEBUG auth: SUPABASE_JWT_SECRET is set={bool(settings.SUPABASE_JWT_SECRET)}, len={len(settings.SUPABASE_JWT_SECRET) if settings.SUPABASE_JWT_SECRET else 0}")
         
+        # Print token header for debugging
+        try:
+            token_header = jwt.get_unverified_header(token)
+            print(f"DEBUG auth: Incoming token header: {token_header}")
+        except Exception as e:
+            print(f"DEBUG auth: Failed to get unverified header: {e}")
+
         # Check if we should try to decode with Supabase JWT secret
         if settings.SUPABASE_JWT_SECRET:
             try:
