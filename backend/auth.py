@@ -34,8 +34,20 @@ def decode_token(token: str) -> Optional[dict]:
         # Check if we should try to decode with Supabase JWT secret
         if settings.SUPABASE_JWT_SECRET:
             try:
+                # Supabase JWT secrets are base64-encoded. We decode them to raw bytes to verify HS256 tokens.
+                import base64
+                try:
+                    # Pad the secret if necessary
+                    padded_secret = settings.SUPABASE_JWT_SECRET
+                    missing_padding = len(padded_secret) % 4
+                    if missing_padding:
+                        padded_secret += '=' * (4 - missing_padding)
+                    secret_bytes = base64.b64decode(padded_secret)
+                except Exception:
+                    secret_bytes = settings.SUPABASE_JWT_SECRET.encode()
+
                 # Supabase tokens are signed with the HS256 algorithm and the JWT secret
-                payload = jwt.decode(token, settings.SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
+                payload = jwt.decode(token, secret_bytes, algorithms=["HS256"], audience="authenticated")
                 return payload
             except JWTError:
                 # If Supabase decoding fails, fall back to our local key
