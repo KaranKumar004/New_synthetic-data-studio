@@ -50,7 +50,10 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<an
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(`${baseUrl}${endpoint}`, {
+  const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  const response = await fetch(`${cleanBaseUrl}${cleanEndpoint}`, {
     ...options,
     headers,
   });
