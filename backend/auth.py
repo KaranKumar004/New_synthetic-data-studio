@@ -31,6 +31,9 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
 
 def decode_token(token: str) -> Optional[dict]:
     try:
+        # Print debug state
+        print(f"DEBUG auth: SUPABASE_JWT_SECRET is set={bool(settings.SUPABASE_JWT_SECRET)}, len={len(settings.SUPABASE_JWT_SECRET) if settings.SUPABASE_JWT_SECRET else 0}")
+        
         # Check if we should try to decode with Supabase JWT secret
         if settings.SUPABASE_JWT_SECRET:
             try:
